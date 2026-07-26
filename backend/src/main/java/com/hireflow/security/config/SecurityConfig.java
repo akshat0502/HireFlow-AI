@@ -5,6 +5,7 @@ import com.hireflow.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,72 +16,77 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private final CustomUserDetailsService userDetailsService;
+        private final CustomUserDetailsService userDetailsService;
 
-    private final PasswordEncoder passwordEncoder;
+        private final PasswordEncoder passwordEncoder;
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+        @Bean
+        SecurityFilterChain securityFilterChain(HttpSecurity http)
+                        throws Exception {
 
-        http
-                .csrf(csrf -> csrf.disable())
+                http
+                                .csrf(csrf -> csrf.disable())
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS))
+                                .sessionManagement(session -> session.sessionCreationPolicy(
+                                                SessionCreationPolicy.STATELESS))
 
-                .authorizeHttpRequests(auth -> auth
+                                .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(
-                                "/api/auth/**"
-                        ).permitAll()
+                                                // Public APIs
+                                                .requestMatchers("/api/auth/**").permitAll()
 
-                        .anyRequest()
-                        .authenticated()
+                                                // Anyone can view jobs
+                                                .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
 
-                )
+                                                // Logged-in users can create/update/delete
+                                                .requestMatchers(HttpMethod.POST, "/api/jobs/**").authenticated()
+                                                .requestMatchers(HttpMethod.PUT, "/api/jobs/**").authenticated()
+                                                .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").authenticated()
 
-                .authenticationProvider(authenticationProvider())
+                                                .anyRequest().authenticated()
 
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class)
+                                )
 
-                .httpBasic(Customizer.withDefaults());
+                                .authenticationProvider(authenticationProvider())
 
-        return http.build();
+                                .addFilterBefore(
+                                                jwtAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class)
 
-    }
+                                .httpBasic(Customizer.withDefaults());
 
-    @Bean
-    AuthenticationProvider authenticationProvider() {
+                return http.build();
 
-        DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider();
+        }
 
-        provider.setUserDetailsService(userDetailsService);
+        @Bean
+        AuthenticationProvider authenticationProvider() {
 
-        provider.setPasswordEncoder(passwordEncoder);
+                DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 
-        return provider;
+                provider.setUserDetailsService(userDetailsService);
 
-    }
+                provider.setPasswordEncoder(passwordEncoder);
 
-    @Bean
-    AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration)
-            throws Exception {
+                return provider;
 
-        return configuration.getAuthenticationManager();
+        }
 
-    }
+        @Bean
+        AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration configuration)
+                        throws Exception {
+
+                return configuration.getAuthenticationManager();
+
+        }
 
 }
