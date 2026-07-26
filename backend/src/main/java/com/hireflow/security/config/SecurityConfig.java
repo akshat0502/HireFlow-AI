@@ -51,6 +51,8 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.PUT, "/api/jobs/**").authenticated()
                                                 .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").authenticated()
 
+                                                .requestMatchers("/api/resume/**").authenticated()
+
                                                 .anyRequest().authenticated()
 
                                 )
