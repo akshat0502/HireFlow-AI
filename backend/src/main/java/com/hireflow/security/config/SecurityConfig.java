@@ -29,44 +29,48 @@ public class SecurityConfig {
         private final PasswordEncoder passwordEncoder;
 
         @Bean
-        SecurityFilterChain securityFilterChain(HttpSecurity http)
-                        throws Exception {
+        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
                 http
                                 .csrf(csrf -> csrf.disable())
 
-                                .sessionManagement(session -> session.sessionCreationPolicy(
-                                                SessionCreationPolicy.STATELESS))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                                 .authorizeHttpRequests(auth -> auth
 
+                                                // Swagger
+                                                .requestMatchers(
+                                                                "/swagger-ui/**",
+                                                                "/swagger-ui.html",
+                                                                "/v3/api-docs/**")
+                                                .permitAll()
+
                                                 // Public APIs
                                                 .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/api/health/**").permitAll()
 
-                                                // Anyone can view jobs
+                                                // Public Job APIs
                                                 .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
 
-                                                // Logged-in users can create/update/delete
+                                                // Protected APIs
                                                 .requestMatchers(HttpMethod.POST, "/api/jobs/**").authenticated()
                                                 .requestMatchers(HttpMethod.PUT, "/api/jobs/**").authenticated()
                                                 .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").authenticated()
 
                                                 .requestMatchers("/api/resume/**").authenticated()
+                                                .requestMatchers("/api/ai/**").authenticated()
+                                                .requestMatchers("/api/job-match/**").authenticated()
 
-                                                .anyRequest().authenticated()
-
-                                )
+                                                .anyRequest().authenticated())
 
                                 .authenticationProvider(authenticationProvider())
 
                                 .addFilterBefore(
                                                 jwtAuthenticationFilter,
-                                                UsernamePasswordAuthenticationFilter.class)
-
-                                .httpBasic(Customizer.withDefaults());
+                                                UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
-
         }
 
         @Bean

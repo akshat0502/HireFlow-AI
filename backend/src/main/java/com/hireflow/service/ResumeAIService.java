@@ -1,5 +1,9 @@
 package com.hireflow.service;
 
-public class ResumeAIService {
-    
+import com.hireflow.dto.response.AIAnalysisResponse;
+
+public interface ResumeAIService {
+
+    AIAnalysisResponse analyzeResume(Long resumeId);
+
 }

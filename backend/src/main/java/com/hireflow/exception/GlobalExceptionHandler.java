@@ -17,6 +17,15 @@ public class GlobalExceptionHandler {
                 .body(new ApiResponse(false, ex.getMessage(), null));
     }
 
+    @ExceptionHandler(AIException.class)
+    public ResponseEntity<ApiResponse> handleAIException(
+            AIException ex) {
+
+        return ResponseEntity.badRequest()
+                .body(new ApiResponse(false, ex.getMessage()));
+
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleException(
             Exception ex) {
