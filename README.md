@@ -1,53 +1,24 @@
 # HireFlow AI
 
-An AI-powered recruitment and job management platform built with React and Spring Boot.
+HireFlow AI is an AI-powered recruitment and job management platform built with React and Spring Boot.
 
-HireFlow AI helps candidates and recruiters manage jobs, resumes, authentication, and AI-powered resume analysis through a modern web application.
+The platform provides secure authentication, job management, resume management, and AI-powered resume analysis to simplify recruitment workflows.
 
 ---
 
 ## 🚀 Features
 
-### Authentication
 - User registration and login
 - JWT-based authentication
-- BCrypt password encryption
-- Role-based user system
-- Secure protected routes
-
-### Job Management
-- View available jobs
-- Create job postings
-- Edit job postings
-- Delete job postings
-- View detailed job information
-- Job location, salary, experience and skills
-
-### Resume Management
-- Upload resumes
-- Download resumes
-- Manage logged-in user's resume
-- PDF resume processing
-
-### AI Resume Analysis
-- Analyze resumes using Gemini AI
-- Extract useful information from resumes
-- Generate AI-powered resume analysis
-- Job/resume matching functionality
-
-### Dashboard
-- Centralized dashboard
-- Quick access to Jobs
-- Resume management
-- AI Analysis
-- Profile
-
-### UI
-- Responsive React interface
-- Tailwind CSS
-- React Router
-- Lucide icons
-- Toast notifications
+- Recruiter and Candidate roles
+- Job creation and management
+- Job search and job details
+- Resume upload and download
+- AI-powered resume analysis
+- Job and resume matching
+- Protected API endpoints
+- Responsive dashboard
+- Swagger API documentation
 
 ---
 
@@ -60,9 +31,9 @@ HireFlow AI helps candidates and recruiters manage jobs, resumes, authentication
 - Tailwind CSS
 - React Router
 - Axios
+- Vite
 - Lucide React
 - React Hot Toast
-- Vite
 
 ### Backend
 
@@ -71,10 +42,10 @@ HireFlow AI helps candidates and recruiters manage jobs, resumes, authentication
 - Spring Security
 - Spring Data JPA
 - Hibernate
-- REST APIs
 - JWT
-- Lombok
 - Maven
+- Lombok
+- REST APIs
 
 ### Database
 
@@ -84,16 +55,13 @@ HireFlow AI helps candidates and recruiters manage jobs, resumes, authentication
 
 - Google Gemini API
 
-### Other Tools
+### API Documentation
 
-- Git
-- GitHub
-- GitHub Actions
 - Swagger / OpenAPI
 
 ---
 
-## 🏗️ Project Structure
+## 📁 Project Structure
 
 ```text
 HireFlow-AI/
@@ -111,8 +79,7 @@ HireFlow-AI/
 │   │       │   ├── exception/
 │   │       │   ├── repository/
 │   │       │   ├── security/
-│   │       │   ├── service/
-│   │       │   └── HireFlowApplication.java
+│   │       │   └── service/
 │   │       │
 │   │       └── resources/
 │   │
