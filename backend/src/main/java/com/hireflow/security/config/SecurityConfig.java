@@ -16,83 +16,132 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.http.HttpMethod;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-        private final CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
-        private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-        @Bean
-        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
-                http
-                                .csrf(csrf -> csrf.disable())
+        http
 
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(Customizer.withDefaults())
 
-                                .authorizeHttpRequests(auth -> auth
+                .csrf(csrf -> csrf.disable())
 
-                                                // Swagger
-                                                .requestMatchers(
-                                                                "/swagger-ui/**",
-                                                                "/swagger-ui.html",
-                                                                "/v3/api-docs/**")
-                                                .permitAll()
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
 
-                                                // Public APIs
-                                                .requestMatchers("/api/auth/**").permitAll()
-                                                .requestMatchers("/api/health/**").permitAll()
+                .authorizeHttpRequests(auth -> auth
 
-                                                // Public Job APIs
-                                                .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
+                        // Swagger
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
+                        ).permitAll()
 
-                                                // Protected APIs
-                                                .requestMatchers(HttpMethod.POST, "/api/jobs/**").authenticated()
-                                                .requestMatchers(HttpMethod.PUT, "/api/jobs/**").authenticated()
-                                                .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").authenticated()
+                        // Public APIs
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/health/**").permitAll()
 
-                                                .requestMatchers("/api/resume/**").authenticated()
-                                                .requestMatchers("/api/ai/**").authenticated()
-                                                .requestMatchers("/api/job-match/**").authenticated()
+                        // Public Job APIs
+                        .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
 
-                                                .anyRequest().authenticated())
+                        // Protected Job APIs
+                        .requestMatchers(HttpMethod.POST, "/api/jobs/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/jobs/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").authenticated()
 
-                                .authenticationProvider(authenticationProvider())
+                        // Protected Resume APIs
+                        .requestMatchers("/api/resume/**").authenticated()
 
-                                .addFilterBefore(
-                                                jwtAuthenticationFilter,
-                                                UsernamePasswordAuthenticationFilter.class);
+                        // Protected AI APIs
+                        .requestMatchers("/api/ai/**").authenticated()
+                        .requestMatchers("/api/job-match/**").authenticated()
 
-                return http.build();
-        }
+                        .anyRequest().authenticated()
+                )
 
-        @Bean
-        AuthenticationProvider authenticationProvider() {
+                .authenticationProvider(authenticationProvider())
 
-                DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
-                provider.setUserDetailsService(userDetailsService);
+        return http.build();
+    }
 
-                provider.setPasswordEncoder(passwordEncoder);
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
 
-                return provider;
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider();
 
-        }
+        provider.setUserDetailsService(userDetailsService);
 
-        @Bean
-        AuthenticationManager authenticationManager(
-                        AuthenticationConfiguration configuration)
-                        throws Exception {
+        provider.setPasswordEncoder(passwordEncoder);
 
-                return configuration.getAuthenticationManager();
+        return provider;
+    }
 
-        }
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration)
+            throws Exception {
+
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+                List.of("http://localhost:5173")
+        );
+
+        configuration.setAllowedMethods(
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "OPTIONS"
+                )
+        );
+
+        configuration.setAllowedHeaders(
+                List.of("*")
+        );
+
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
+
+        return source;
+    }
 
 }

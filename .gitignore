@@ -1,3 +1,26 @@
 target/
 node_modules/
 .env
+# Backend secrets
+backend/src/main/resources/application.properties
+
+# Backend build
+backend/target/
+
+# Frontend dependencies/build
+frontend/node_modules/
+frontend/dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Uploaded files
+uploads/
+backend/uploads/
+
+# IDE
+.idea/
+.vscode/
+*.iml
